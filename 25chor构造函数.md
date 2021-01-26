@@ -1,0 +1,117 @@
+# constructor(ctor) 构造函数
+## 特点
+* chor（构造函数）在对象实例化时被调用
+* 构造函数与类名同名
+* 构造函数无返回值
+* 构造函数多个重载
+* 实例化对象仅用到一个构造函数
+* 没有定义构造函数时，编译器自动定义构造函数
+
+## 默认构造函数
+* 类实例化不需要传递参数，则使用默认构造函数。
+* ①无参构造函数一定是默认构造函数
+* ②对于有参构造函数如果参数带默认值，也是默认构造函数
+```C++
+class Student{
+public:
+    Student():m_strName("Jim"){}//②默认chor初始化
+    //Student(string name = "Jim")
+private:
+    string m_strName;
+};
+```
+```C++
+int main(){
+    Student stu1();
+    Student *p = NULL;
+    p = new Student;
+    return 0;
+}
+```
+## 构造函数初始化列表
+* 初始化列表先于构造函数执行
+* 初始化列表只能用于构造函数
+* 初始化列表可以同时初始化多个数据成员
+
+
+```C++
+class complex{
+public:
+    complex (double r = 0,double i = 0)//default argument（默认实参
+    //initialization list 初始列,只有构造函数有，不用分号
+    : re(r),im(i)//这样写是比较符合规范的初始化方式
+    {}
+    complex& operator +=(const complex&);
+    double real () const {return re;}
+    double imag () const {return im;}
+private:
+    double re,im;
+
+    friend complex& __doapl (complex* ,const complex&);
+};
+```
+
+
+```C++
+complex c1(2,1);
+complex c2;//采用默认实参
+complex* p = new complex(4);
+```
+---
+## 拷贝构造函数
+如果我们在实例化时，定义x1,x2=x1,x3(x1),我们发现在每次实例化运行构造函数的条件下，应该运行三次，实际只有一次，其实这是拷贝构造函数的原因。
+
+* 如果没有自定义拷贝构造函数，系统自动生成
+* 采用直接初始化或复制初始化实例对象时，系统自动调用拷贝构造函数
+
+定义格式```类名（const 类名&变量名）```
+
+```C++
+class Student{
+public:
+    Student(){m_strName = "Jim";)//不过这里不是初始列写法？难道有要求？
+    Student(const Student& stu){}
+private:
+    string m_strName;
+};
+```
+---
+##  ctor可以有很多个 overlodading 重载
+```C++
+complex (double r = 0,double i = 0)
+    : re(r),im(i)
+    { }
+    complex () : re(0),im(0){}//这里和前面重了，所以不允许存在
+```
+
+```C++
+void real(double r) const { re = r; }
+//这个同名函数在类外定义，但不会覆盖内部，可以存在
+```
+
+## ctor 被放在private区
+一般来说我们不允许,因为这样不允许外界创建对象。 
+```C++
+private:
+    double re,im;
+    complex (double r = 0,double i = 0)
+    :re(r),im(i)
+    { }
+```
+设计模式 
+```C
+class A{
+    public:
+    static A& getInstance();
+    setup(){...}
+    private:
+    A();
+    A(const A& rhs);
+    ...
+};
+
+A& A::getInstance(){
+    static A a;
+    return a;
+}
+```
